@@ -5,50 +5,49 @@ import {ContactList} from "components/ContactList/ContactList"
 import { Filter } from "./Filter/Filter"
 // import { nanoid } from 'nanoid';
 export function App() {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(() => JSON.parse(localStorage.getItem('contacts')) ?? []);
   const [filter, setFilter] = useState("")
 
 
   const formSubmitHandler = data => {
-    //  const contact = {
-    //   id: nanoid(),
-    //   name: data.name,
-    //   number: data.number,
-    // };
-
-    // if (isDuplicate(contact)) {
-    //   return alert(`${contact.name} is already in contacts`);
-    // }
-    setContacts(prevContacts => [...prevContacts, ...data])
+     const { name, number, id } = data;
+   
+    if (isDuplicate(name)) {
+       alert(`${name} is already in contacts`);
+    return
+    }
+  const contactItem = {
+      name,
+    number,
+      id
+    };
+    setContacts(contacts => [contactItem, ...contacts])
+  }
   
+  const isDuplicate = contactName => {
+   const lowercaseName = contactName.toLowerCase();
+   return contacts.find(({name}) => name.toLowerCase().includes(lowercaseName));
+    
   }
 
-  // isDuplicate({ name }) {
-  //   const result = contacts.find((item) => item.name === name);
-  //   return result;
-  // }
 
- const  removeContact = (id) => {
-    setContacts((prevContacts) => {
-      return prevContacts.filter((item) => item.id !== id)})
+  const removeContact = contactId  => {
+
+     setContacts(contacts.filter(contact => contact.id !== contactId ));
   }
   
   const changeFilter = (e) => {
 setFilter(e.currentTarget.value) 
   }
 
-  useEffect(() => {
-    localStorage.setItem("contacts", JSON.stringify(contacts));
-    const people = localStorage.getItem("contacts");
-    const parsedPeople = JSON.parse(people);
-    if (parsedPeople) {
-      function DoIt () { setContacts((prevContacts) => [...prevContacts, ...parsedPeople]) }
-      DoIt ()
-    }
-},[contacts])
+useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+ 
+const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
-const normalizedFilter = filter.toLocaleLowerCase()
-const filteredContacts = contacts.filter(contact => contact.name.toLocaleLowerCase().includes(normalizedFilter))
   return (
     <>
       <Section title="Phonebook">
