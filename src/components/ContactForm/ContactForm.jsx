@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { useState } from "react"
 import { nanoid } from 'nanoid'
 import {StyledForm} from "components/ContactForm/ContactForm.styled"
 import { StyledLabel } from "components/CommonStyled/Label.styled"
@@ -6,46 +6,46 @@ import {StyledInput} from "components/CommonStyled/Input.styled"
 import { StyledBtn } from "components/CommonStyled/Btn.styled"
 import PropTypes from 'prop-types';
 
-export class ContactForm extends Component {
-    state = {
-        id: "",
-      name: '',
-      number: ""
+export function ContactForm({ onSubmit }) {
+  const [id, setId] = useState("");
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("")
+  
+ 
+
+const handleInputChange = event => {
+  const { name, value } = event.currentTarget
+   switch (name) {
+      case 'name':
+       setName(value);
+       setId(nanoid())
+        break;
+
+      case 'number':
+       setNumber(value);
+       setId(nanoid())
+        break;
+
+      default:
+        throw new Error('Not supported type');
     }
-
-  nameInputId = nanoid()
-  numberInputId = nanoid()
-
-     handleInputChange = event => {
-    const {name, value} = event.currentTarget
-    this.setState(
-        {
-            [name]: value,
-            id: nanoid()}
-    )
     }
     
-      handleSubmit = e => {
+      const handleSubmit = e => {
     e.preventDefault();
-          
-          this.props.onSubmit(this.state)
-          this.reset()
+    onSubmit({name, number, id})
+    reset()
     }
     
-    reset = () => {
-        this.setState({
-             id: "",
-            name: '',
-            number: ""
-        })
+   const reset = () => {
+      setId("");
+      setName("");
+      setNumber("");
     }
 
-    render() {
-        const { name, number } = this.state
-        return (
-            
-            <StyledForm onSubmit={this.handleSubmit}>
-          <StyledLabel htmlFor={this.nameInputId}>Name</StyledLabel>
+  return (
+    <StyledForm onSubmit={handleSubmit}>
+          <StyledLabel >Name</StyledLabel>
           <StyledInput
           type="text"
           name="name"
@@ -53,10 +53,10 @@ export class ContactForm extends Component {
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
           value={name}
-          onChange={this.handleInputChange}
-          id={this.nameInputId}
+          onChange={handleInputChange}
+         
             />
-            <StyledLabel htmlFor={this.numberInputId}>Number</StyledLabel>
+            <StyledLabel>Number</StyledLabel>
             <StyledInput
           type="tel"
           name="number"
@@ -64,14 +64,11 @@ export class ContactForm extends Component {
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
               required
           value={number}
-          onChange={this.handleInputChange}
-          id={this.numberInputId}
-              
+          onChange={handleInputChange}                   
 />
           <StyledBtn type="submit">Add Contact</StyledBtn>
         </StyledForm>
-        )
-    }
+    )     
 }
 
 ContactForm.propTypes = {
